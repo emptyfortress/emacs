@@ -751,6 +751,144 @@ package show feedback on evil edit code
 
 #+END_SRC
 
+** Smart mode line
+#+BEGIN_SRC emacs-lisp
+  (use-package smart-mode-line-powerline-theme
+    :ensure t)
+
+  (use-package smart-mode-line
+    :ensure t
+    :config
+    (setq sml/theme 'powerline)
+    (add-hook 'after-init-hook 'sml/setup))
+
+  (use-package diminish
+    :ensure t) ;; remove minor mode from smartline
+
+#+END_SRC
+
+** html to pug
+#+BEGIN_SRC emacs-lisp
+  (defun toPug ()
+    (interactive)
+    ;; remove space in tags
+    (evil-goto-first-line)
+    (evil-next-visual-line)
+    (while (re-search-forward "<\\s-*" nil t)
+      (replace-match "<"))
+    (evil-goto-first-line)
+    (evil-next-visual-line)
+    (while (re-search-forward "\\s-*>" nil t)
+      (replace-match ">"))
+    ;; merge broken lines
+    (evil-goto-first-line)
+    (setq brokenLines "\n\\s-+\\([a-z:@>]\\)")
+    (while (re-search-forward brokenLines nil t)
+      (replace-match " \\1"))
+    ;; remove close tags
+    (evil-goto-first-line)
+    (evil-next-visual-line)
+    (re-search-forward "</template>")
+    (evil-first-non-blank)
+    (while (re-search-backward "</.+>" nil t)
+      (replace-match ""))
+    ;; remove blank lines
+    (evil-goto-first-line)
+    (flush-lines "^\\s-+$")
+    ;; remove < in tag with attributes
+    (evil-goto-first-line)
+    (evil-next-visual-line)
+    (while (re-search-forward "<\\([a-z-]+\\) " nil t)
+      (replace-match "\\1( "))
+    ;; convert tags without attributes
+    (evil-goto-first-line)
+    (evil-next-visual-line)
+    (while (re-search-forward "<\\([a-z-]+\\)>" nil t)
+      (replace-match "\\1 "))
+    ;; remove > $
+    (evil-goto-first-line)
+    (evil-next-visual-line)
+    (while (re-search-forward ">\\s-*?$" nil t)
+      (replace-match " )"))
+    ;; remove > 
+    (evil-goto-first-line)
+    (evil-next-visual-line)
+    (while (re-search-forward "> *?" nil t)
+      (replace-match " ) "))
+    ;; restore closing template tag
+    (evil-goto-first-line)
+    (while (re-search-forward "</template )" nil t)
+      (replace-match "</template>"))
+    ;; clean brackets
+    (evil-goto-first-line)
+    (while (re-search-forward "\n )" nil t)
+      (replace-match " )"))
+    )
+
+  (defun classPug()
+    (interactive)
+    (evil-goto-first-line)
+    (while (re-search-forward "class=\"\\b\\(.*\\)\\b\"\\(.*)\\)" nil t)
+      (replace-match "\\2\.\\1")
+      )
+    )
+
+  #+END_SRC
+
+** translate
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package google-translate :ensure t)
+  ;; (use-package google-translate-smooth-ui :ensure t)
+    (require 'google-translate)
+    (require 'google-translate-smooth-ui)
+    (setq google-translate-translation-directions-alist 
+          '(("en" . "ru") ("ru" . "en") ("de" . "ru")))
+    (setq google-translate-output-destination 'echo-area)
+    (evil-leader/set-key
+      ",tr" 'google-translate-smooth-translate)
+
+#+END_SRC
+
+** key chords
+#+BEGIN_SRC emacs-lisp
+  (use-package key-chord :ensure t)
+    ;; (require 'key-chord)
+  (key-chord-mode 1)
+#+END_SRC
+
+** expand-region
+#+BEGIN_SRC emacs-lisp
+  (require 'expand-region)
+  (key-chord-define-global "vv"  'er/expand-region)
+
+#+END_SRC
+
+** abbrev
+#+BEGIN_SRC emacs-lisp
+(load "~/.emacs.d/lisp/my-abbrev.el")
+(defun insert-space-or-expand-abbrev ()
+  "Expand abbrev if previous char is a space, or insert a space."
+  (interactive)
+  (if (not (equal (char-before) ?\s))
+      (insert-char ?\s)
+    (backward-char)
+    (unless (expand-abbrev)
+      (insert-char ?\s))
+    (forward-char)))
+
+(global-set-key " " #'insert-space-or-expand-abbrev)
+#+END_SRC
+
+** ace-window
+#+BEGIN_SRC emacs-lisp
+  (use-package ace-window
+    :config
+    (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+    :bind ("M-o" . ace-window))
+
+#+END_SRC
+
+
 
 ** Avy
 #+BEGIN_SRC emacs-lisp
