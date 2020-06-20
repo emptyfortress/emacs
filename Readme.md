@@ -5,4 +5,3 @@ This is my configuration of Emacs in org-files
 * org-mode
 * avy
 * org-roam
-
