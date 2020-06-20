@@ -715,6 +715,42 @@
 
 #+END_SRC
 
+** Insert blank lines
+#+BEGIN_SRC emacs-lisp
+  (defun around-line ()
+    "Insert an empty line above and below the current line."
+    (interactive)
+    (save-excursion
+      (end-of-line)
+      (open-line 1)
+      (end-of-line 0)
+      (open-line 1)))
+
+  (general-define-key
+   :states '(normal visual)
+   :prefix ",,"
+   "a" 'around-line)
+
+#+END_SRC
+
+** Evil-googles
+package show feedback on evil edit code
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-goggles
+    :ensure t
+    :config
+    (evil-goggles-mode))
+#+END_SRC
+
+** evil-numbers
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-numbers
+  :ensure t)
+(define-key evil-normal-state-map (kbd "C-=") 'evil-numbers/inc-at-pt)
+(define-key evil-normal-state-map (kbd "C--") 'evil-numbers/dec-at-pt)
+
+#+END_SRC
+
 
 ** Avy
 #+BEGIN_SRC emacs-lisp
