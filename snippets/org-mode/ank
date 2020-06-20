@@ -1,0 +1,17 @@
+# -*- mode: snippet -*-
+# name: anki
+# key: aa
+# --
+
+${1:enumerate}
+  :PROPERTIES:
+  :ANKI_DECK: Emacs
+  :ANKI_NOTE_TYPE: Basic
+  :ANKI_TAGS: emacs shorcuts ${2:}
+  :END:
+*** Front
+$1
+*** Back
+${3:back}
+
+$0

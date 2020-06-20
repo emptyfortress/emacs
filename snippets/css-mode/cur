@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: cursor
+# key: cur
+# --
+cursor: ${1:pointer};

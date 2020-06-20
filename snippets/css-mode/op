@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: opacity
+# key: op
+# --
+opacity: ${1:.8};

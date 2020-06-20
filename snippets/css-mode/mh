@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: min-height
+# key: mh
+# condition: (looking-back "mh" nil)
+# --
+min-height: $1;

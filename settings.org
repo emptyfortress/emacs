@@ -180,6 +180,9 @@
       (interactive)
       (revert-buffer t (not (buffer-modified-p)) t))
 
+    (define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
+    (define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line)
+
 #+END_SRC
 
 ** Org-mode evil keybindings
@@ -195,6 +198,18 @@
 	",z" 'my-delete-capture-window
 	"z" 'my-save-and-close
 	)
+
+    (general-define-key
+    :keymaps 'org-mode-map
+    :states '(normal visual)
+    :prefix ","
+    "nn" '(org-narrow-to-subtree :which-key "narrow to subtree"))
+
+    (general-define-key
+    :keymaps 'org-mode-map
+    :states '(normal visual)
+    :prefix ","
+    "nw" '(widen :which-key "widen"))
 
     (general-define-key
 	:keymaps 'org-mode-map
@@ -292,3 +307,118 @@
 
 #+END_SRC
    
+** Git-gutter
+#+BEGIN_SRC emacs-lisp
+  (use-package git-gutter
+    :config
+    (global-git-gutter-mode +1)
+    (set-face-background 'git-gutter:modified 'nil) ;; background color
+    (set-face-background 'git-gutter:added 'nil) ;; background color
+    (set-face-background 'git-gutter:deleted 'nil) ;; background color
+    (set-face-foreground 'git-gutter:added "green")
+    (set-face-foreground 'git-gutter:deleted "red"))
+#+END_SRC
+
+** Ranger
+#+BEGIN_SRC emacs-lisp
+  (use-package ranger
+    :config
+    (ranger-override-dired-mode t)
+    (setq ranger-cleanup-eagerly t))
+  (defun xah-dired-mode-setup ()
+    "to be run as hook for `dired-mode'."
+    (dired-hide-details-mode 1))
+  (add-hook 'dired-mode-hook 'xah-dired-mode-setup)
+#+END_SRC
+** Preferences
+*** Swap windows
+#+BEGIN_SRC emacs-lisp
+
+  (general-define-key
+   :states 'normal
+    :prefix ",,"
+   "x" 'window-swap-states)
+
+#+END_SRC
+
+*** swap : ;
+#+BEGIN_SRC emacs-lisp
+
+  ;; swap ;: for better experience
+  (general-swap-key nil 'motion
+    ";" ":")
+
+;; remap find next char and reverse
+
+    (general-define-key
+    :states 'normal
+    "SPC" 'evil-repeat-find-char)
+
+    (general-define-key
+    :states 'normal
+      "DEL" 'evil-repeat-find-char-reverse)
+
+#+END_SRC
+
+*** scrolling
+#+BEGIN_SRC emacs-lisp
+  (setq-default
+   ;; left-margin-width 1 right-margin-width 1
+   ;; scroll-conservatively most-positive-fixnum       ; Always scroll by one line
+   scroll-conservatively 100000       ; Always scroll by one line
+   scroll-margin 5
+   scroll-preserve-screen-position 1
+   cursor-in-non-selected-windows t)
+#+END_SRC
+
+*** jump to end /start of line in insert mode
+#+BEGIN_SRC emacs-lisp
+    (general-imap "A"
+      (general-key-dispatch 'self-insert-command
+        :timeout 0.2
+        "A" 'evil-append-line))
+
+    (general-imap "I"
+      (general-key-dispatch 'self-insert-command
+        :timeout 0.2
+        "I" 'evil-insert-line))
+
+    (general-imap ";"
+      (general-key-dispatch 'self-insert-command
+        :timeout 0.2
+        ";" (general-simulate-key ('evil-append-line ";"))))
+
+  ;; (general-nmap ";"
+  ;;       (general-key-dispatch 'self-insert-command
+  ;;         :timeout 0.2
+  ;;         ";" (general-simulate-key ('evil-append-line ";" ))))
+
+#+END_SRC
+
+** yasnippet
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet
+    :ensure t
+    :init
+    (yas-global-mode 1)
+    :config
+    (setq yas-indent-line nil)
+    (define-key yas-minor-mode-map (kbd "<tab>") nil)
+    (define-key yas-minor-mode-map (kbd "TAB") nil)
+    ;; Bind `SPC' to `yas-expand' when snippet expansion available (it
+    ;; will still call `self-insert-command' otherwise).
+    (define-key yas-minor-mode-map (kbd "SPC") yas-maybe-expand)
+    ;; (define-key yas-minor-mode-map (kbd "TAB") #'yas-expand)
+    ;; (define-key yas-minor-mode-map (kbd "<tab>") #'yas-expand)
+    )
+
+  (general-define-key
+   :states '(normal visual)
+   :prefix ","
+   "ya" 'yas-new-snippet)
+
+  (general-define-key
+   :states '(normal visual)
+   :prefix ","
+   "yv" 'yas-visit-snippet-file)
+#+END_SRC

@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: template
+# key: tem
+# --
+<template lang="pug">
+$0
+</template>

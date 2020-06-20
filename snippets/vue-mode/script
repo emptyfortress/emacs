@@ -1,0 +1,16 @@
+# -*- mode: snippet -*-
+# name: script full
+# key: script
+# --
+
+<script>
+
+export default {
+	data () {
+		return {
+			$0
+		}
+	}
+}
+
+</script>
