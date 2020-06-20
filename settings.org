@@ -422,3 +422,302 @@
    :prefix ","
    "yv" 'yas-visit-snippet-file)
 #+END_SRC
+** Projectile
+#+BEGIN_SRC emacs-lisp
+  (use-package projectile
+    :ensure t
+    :config
+    (projectile-global-mode)
+    (setq projectile-enable-caching t)
+    (setq projectile-project-search-path '("~/Develop/"))
+    (setq projectile-completion-system 'ivy))
+  (use-package counsel-projectile
+    :ensure t
+    :config
+    (counsel-projectile-mode))
+#+END_SRC
+
+** Autocomplete
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+    :ensure t
+    :config
+    (setq company-idle-delay 0)
+    (setq company-minimum-prefix-length 3)
+    (global-company-mode t))
+
+  (add-hook 'after-init-hook 'global-company-mode)
+
+#+END_SRC
+
+** Cursor color
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path "/Users/admin/.emacs.d/lisp")
+  (require 'cursor-chg)  ; Load the library
+   ;; (toggle-cursor-type-when-idle 1) ; Turn on cursor change when Emacs is idle
+   (change-cursor-mode 1) ; Turn on change for overwrite, read-only, and input mode
+#+END_SRC
+
+** orgmode
+#+BEGIN_SRC emacs-lisp
+  (use-package org
+    :ensure org-plus-contrib)
+  (setq gtd-base-path (expand-file-name "/Users/admin/Develop/org/"))
+  (defun gtd-path (sub-path) (concat gtd-base-path sub-path))
+
+  (defvar inbox (gtd-path "inbox.org"))
+  (defvar gtd (gtd-path "gtd.org"))
+  (defvar foo (gtd-path "foo.org"))
+  (defvar journal (gtd-path "journal.org"))
+  (defvar roam (gtd-path "roam/"))
+  (defvar someday (gtd-path "someday.org"))
+  (defvar tickler (gtd-path "tickler.org"))
+  (defvar ref (gtd-path "ref.org"))
+  (defvar keys (gtd-path "keys.org"))
+
+  (setq org-agenda-files (list inbox foo journal gtd ref someday tickler))
+
+  (setq org-refile-targets `((gtd :maxlevel . 5)
+                             (ref :maxlevel . 5)
+                             (inbox :maxlevel . 5)
+                             (foo :maxlevel . 2)
+                             (journal :maxlevel . 2)
+                             (roam :maxlevel . 2)
+                             (gtd :maxlevel . 2)
+                             (someday :maxlevel . 5)
+                             (tickler :maxlevel . 5)))
+
+  (setq org-refile-use-outline-path t)  ;; refile items in steps with ivy
+  (setq org-outline-path-complete-in-steps nil)
+  (setq org-refile-allow-creating-parent-nodes (quote confirm))
+  (setq org-agenda-todo-ignore-scheduled 'all) ;; ignore todo which is scheduled in todo list
+  (setq org-agenda-todo-ignore-deadlines 'all) ;; ignore deadlines in todo list
+  (setq calendar-week-start-day 1)
+
+      ;; set custom agenda view
+      ;; (setq org-agenda-custom-commands
+      ;;       '(("f" "Ideas" todo "FOO")
+      ;;       ("b" "Купить" tags "buy")))
+
+  (defvar inbox-capture-template "* %i%?\n%U\n")
+  (defvar todo-capture-template "* TODO %i%?          \n%U\n%a\n")
+  (defvar tickler-capture-template "* %i%?\n%U\n")
+  (defvar fix-capture-template "* BUG %i%?\n%U\n%a\n")
+  (defvar keys-capture-template "* aa%?")
+
+  ;; this is something with capture links, I think
+  (defun transform-square-brackets-to-round-ones(string-to-transform)
+    "Transforms [ into ( and ] into ), other chars left unchanged."
+    (concat 
+     (mapcar #'(lambda (c) (if (equal c ?[) ?\( (if (equal c ?]) ?\) c))) string-to-transform))
+    )
+
+  (setq org-capture-templates `(
+                                ("i" "Inbox" entry (file inbox) ,inbox-capture-template)
+                                ("t" "Inbox [TODO]" entry (file inbox) ,todo-capture-template)
+                                ("T" "Tickler" entry (file+headline tickler "Tickler") ,tickler-capture-template)
+                                ("f" "Foo" entry (file+headline foo "ideas") "* FOO %i%?")
+                                ("k" "Keys" entry (file+headline keys "Keys") ,keys-capture-template)
+                                ("n" "Note" entry (file ref) ,inbox-capture-template)
+                                ("B" "Bug" entry (file+headline gtd "Bugs"),fix-capture-template)
+                                ("j" "Journal" entry (file+olp+datetree "~/Develop/org/journal.org") "**** %<%H:%M> - %?\n%a\n" :tree-type week)
+                                ("p" "Protocol" entry (file inbox) 
+                                      "* %?\n%u\n\n%a\n \n%i\n")
+                                ("L" "Link" entry (file inbox)
+                                 "* [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n%? \n\n%u")
+                                ("m" "Meeting" entry (file inbox)
+                                 "* MEETING with %? :MEETING:\n%U\n\n" :clock-in t :clock-resume t)
+                                ("b" "Buy" entry (file+headline gtd "Buy") "* %i%?\n%U")
+                                ))
+
+  (setq org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "WAITING(w!)" "|" "DONE(d!)" "CANCELLED(c!)")
+                            (sequence "FOO(f)" "|" "ZEN(z!)")
+                            (sequence "BUG(B)" "|" "FIXED(x!)")))
+
+  (setq org-log-into-drawer 'LOGBOOK)
+
+  (setq org-todo-keyword-faces
+        '(("WAITING" . "#666565") ("CANCELLED" . "#663333") ("NEXT" . "Yellow") ("DONE" . "#00ff00") ("FOO" . "#51ABFF")))
+
+	(setq org-tag-alist
+        '(("work" . ?w)
+          ("home" . ?h)
+          ;; ("PRESENTATION" . ?p)
+          ;; ("BRAINSTORM" . ?s)
+          ("read" . ?r)
+          ("emacs" . ?e)
+          ("refile" . ?f)
+	  ("code" . ?c)
+	  ;; ("article" . ?a)
+          ("movie" . ?m)))
+
+  ;; this for prettify orgmode
+  (setq org-startup-indented t
+        ;; org-ellipsis "  "
+        org-hide-leading-stars t
+        org-src-fontify-natively t
+        org-src-tab-acts-natively t
+        org-pretty-entities t
+        org-hide-emphasis-markers t
+        org-agenda-block-separator ""
+        org-fontify-whole-heading-line t
+        org-fontify-done-headline t
+        org-fontify-quote-and-verse-blocks t)
+
+#+END_SRC
+  
+** org-agenda evil bindings
+#+BEGIN_SRC emacs-lisp
+    (eval-after-load 'org-agenda
+     '(progn
+        (evil-set-initial-state 'org-agenda-mode 'normal)
+        (evil-define-key 'normal org-agenda-mode-map
+          (kbd "<RET>") 'org-agenda-switch-to
+          (kbd "\t") 'org-agenda-goto
+
+          "q" 'org-agenda-quit
+          "x" 'org-agenda-exit
+          "r" 'org-agenda-refile
+          "a" 'org-archive-subtree-default
+          "gr" 'org-agenda-redo
+          "S" 'org-save-all-org-buffers
+          "gj" 'org-agenda-goto-date
+          "gJ" 'org-agenda-clock-goto
+          "gm" 'org-agenda-bulk-mark
+          "go" 'org-agenda-open-link
+          "s" 'org-agenda-schedule
+          "B" 'org-agenda-bulk-action
+          "+" 'org-agenda-priority-up
+          ;; "," 'org-agenda-priority
+          "-" 'org-agenda-priority-down
+          "y" 'org-agenda-todo-yesterday
+          "n" nil  ; evil-search-next
+          "n" 'org-agenda-add-note
+          "t" 'org-agenda-todo
+          ":" 'org-agenda-set-tags
+          ";" 'org-timer-set-timer
+          "I" 'org-agenda-clock-in
+          "O" 'org-agenda-clock-out
+          "u" 'org-agenda-bulk-unmark
+          "j"  'org-agenda-next-line
+          "k"  'org-agenda-previous-line
+          "vt" 'org-agenda-toggle-time-grid
+          "va" 'org-agenda-archives-mode
+          "vw" 'org-agenda-week-view
+          "vl" 'org-agenda-log-mode
+          "vd" 'org-agenda-day-view
+          "vc" 'org-agenda-show-clocking-issues
+          "g/" 'org-agenda-filter-by-tag
+          "o" 'delete-other-windows
+          "gh" 'org-agenda-holiday
+          "gv" 'org-agenda-view-mode-dispatch
+          "f" 'org-agenda-later
+          "b" 'org-agenda-earlier
+          "c" 'org-capture
+          "e" 'org-agenda-set-effort
+          "{" 'org-agenda-manipulate-query-add-re
+          "}" 'org-agenda-manipulate-query-subtract-re
+          "A" 'org-agenda-toggle-archive-tag
+          "." 'org-agenda-goto-today
+          ;; "0" 'evil-digit-argument-or-evil-beginning-of-line
+          ;; "<" 'org-agenda-filter-by-category
+          ">" 'org-agenda-date-prompt
+          "F" 'org-agenda-follow-mode
+          "D" 'org-agenda-deadline
+          "H" 'org-agenda-holidays
+          "J" 'org-agenda-next-date-line
+          "K" 'org-agenda-previous-date-line
+          "L" 'org-agenda-recenter
+          ;; "P" 'org-agenda-show-priority
+          "R" 'org-agenda-clockreport-mode
+          "Z" 'org-agenda-sunrise-sunset
+          "T" 'org-agenda-show-tags
+          "X" 'org-agenda-clock-cancel
+          "[" 'org-agenda-manipulate-query-add
+          ;; "g\\" 'org-agenda-filter-by-tag-refine
+          "]" 'org-agenda-manipulate-query-subtract)))
+
+#+END_SRC
+
+** Vue
+#+BEGIN_SRC emacs-lisp
+  (use-package vue-mode
+    :ensure t)
+  (add-hook 'mmm-mode-hook
+            (lambda ()
+              (set-face-background 'mmm-default-submode-face nil)))
+#+END_SRC
+  
+** JScript
+#+BEGIN_SRC emacs-lisp
+  (use-package js
+    :ensure nil
+    :delight js-mode "JavaScript"
+    :preface
+    (defun me/js-prettify-symbols-mode-on ()
+      (add-to-list 'prettify-symbols-alist '("function" . ?\u0192))
+      (prettify-symbols-mode 1))
+    :hook (js-mode . me/js-prettify-symbols-mode-on)
+    :config (setq-default js-indent-level 2))
+
+  (use-package json-mode
+    :delight json-mode "JSON"
+    :mode "\\.json\\'"
+    :preface
+    (defun me/json-set-indent-level ()
+      (setq-local js-indent-level 2))
+    :hook (json-mode . me/json-set-indent-level))
+
+#+END_SRC
+
+** Tab config
+#+BEGIN_SRC emacs-lisp
+  ;; Create a variable for our preferred tab width
+  (setq custom-tab-width 2)
+
+  ;; Two callable functions for enabling/disabling tabs in Emacs
+  (defun disable-tabs () (setq indent-tabs-mode nil))
+  (defun enable-tabs  ()
+    (local-set-key (kbd "TAB") 'tab-to-tab-stop)
+    (setq indent-tabs-mode t)
+    (setq tab-width custom-tab-width))
+
+  ;; Hooks to Enable Tabs
+  (add-hook 'prog-mode-hook 'enable-tabs)
+  (add-hook 'vue-mode-hook 'enable-tabs)
+  ;; Hooks to Disable Tabs
+  (add-hook 'lisp-mode-hook 'disable-tabs)
+  (add-hook 'emacs-lisp-mode-hook 'disable-tabs)
+
+  ;; Language-Specific Tweaks
+  (setq-default python-indent-offset custom-tab-width) ;; Python
+  (setq-default js-indent-level custom-tab-width)      ;; Javascript
+
+  ;; Making electric-indent behave sanely
+  (setq-default electric-indent-inhibit t)
+
+  ;; Make the backspace properly erase the tab instead of
+  ;; removing 1 space at a time.
+  (setq backward-delete-char-untabify-method 'hungry)
+
+  ;; (OPTIONAL) Shift width for evil-mode users
+  ;; For the vim-like motions of ">>" and "<<".
+  (setq-default evil-shift-width custom-tab-width)
+  (setq pug-tab-width 2)
+  ;; WARNING: This will change your life
+  ;; (OPTIONAL) Visualize tabs as a pipe character - "|"
+  ;; This will also show trailing characters as they are useful to spot.
+  (setq whitespace-style '(face tabs tab-mark trailing))
+
+  (setq whitespace-display-mappings
+        '((tab-mark 9 [124 9] [92 9]))) ; 124 is the ascii ID for '\|'
+  (global-whitespace-mode) ; Enable whitespace mode everywhere
+
+#+END_SRC
+
+
+** Avy
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package avy :ensure t
+  ;;   :commands (avy-goto-word-1))
+#+END_SRC
