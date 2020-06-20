@@ -1,0 +1,294 @@
+* Setup
+
+** Configure package sources
+#+BEGIN_SRC emacs-lisp
+  (setq package-archives '(("org"       . "http://orgmode.org/elpa/")
+                           ("gnu"       . "http://elpa.gnu.org/packages/")
+                           ("melpa"     . "https://melpa.org/packages/")))
+  (setq package-enable-at-startup nil)
+#+END_SRC
+
+** Edit config
+#+BEGIN_SRC emacs-lisp
+  (defun find-config ()
+    "Edit settings.org"
+    (interactive)
+    (find-file "~/.emacs.d/settings.org"))
+  (global-set-key (kbd "C-c i") 'find-config)
+#+END_SRC
+
+** gruvbox
+#+BEGIN_SRC emacs-lisp
+  (load-theme 'gruvbox t)
+#+END_SRC
+
+** bootstrap use-package
+#+BEGIN_SRC emacs-lisp
+  (unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+    (package-install 'use-package))
+#+END_SRC
+
+** Remove bells
+#+BEGIN_SRC emacs-lisp
+  ;; (menu-bar-mode -1)
+  (scroll-bar-mode 0)
+  (tool-bar-mode 0)
+  (setq visible-bell nil)
+  (setq ring-bell-function 'ignore)
+#+END_SRC
+
+** Misc
+#+BEGIN_SRC emacs-lisp
+  (setq default-input-method "russian-computer")
+  (defalias 'yes-or-no-p 'y-or-n-p)
+  (line-number-mode 1)
+  (column-number-mode 1)
+  (setq inhibit-startup-message t)
+  (setq initial-scratch-message nil)
+  (set-frame-font "Anonymous Pro for Powerline-18:antialiasing=false")
+  ;; (set-frame-font "Iosevka-19:light:antialiasing=false")
+  ;; Disable backup/autosave files
+  (setq make-backup-files        nil)
+  (setq auto-save-default        nil)
+  (setq auto-save-list-file-name nil)
+
+  ;; show relative line numbers
+  (global-display-line-numbers-mode)
+  ;; (add-hook 'org-mode-hook (lambda () (display-line-numbers-mode -1))) ;; remove line numbers in org
+
+  (setq display-line-numbers-type 'relative)
+  (setq display-line-numbers-current-absolute t)
+  (global-hl-line-mode 1)
+    ;; (global-visual-line-mode t)
+  (electric-pair-mode 1)
+  (blink-cursor-mode 0)
+
+  (setq require-final-newline t) ;; remove end of file message in magit
+
+  (setq show-paren-delay 0)
+  (show-paren-mode 1)
+
+#+END_SRC
+
+** Evil mode
+#+BEGIN_SRC emacs-lisp
+;; (use-package evil
+;;   :ensure t ;; install the evil package if not installed
+;;   :init ;; tweak evil's configuration before loading it
+;;    (setq evil-search-module 'evil-search)
+;;    (setq evil-ex-complete-emacs-commands nil)
+;;    (setq evil-vsplit-window-right t)
+;;    (setq evil-split-window-below t)
+;;    (setq evil-shift-round nil)
+;;    (setq evil-want-C-u-scroll t)
+;;   :config ;; tweak evil after loading it
+;;   (evil-mode 1))
+
+(use-package evil
+    :ensure t
+    :init
+    (setq evil-want-integration t)
+    (setq evil-want-keybinding nil)
+    (setq evil-vsplit-window-right t)
+    :config
+    (evil-mode 1))
+
+(use-package evil-collection
+    :after evil
+    :ensure t
+    :config
+    (evil-collection-init))
+
+(use-package evil-leader
+    :ensure t
+    :config
+    (global-evil-leader-mode))
+
+(use-package evil-surround
+    :ensure t
+    :config
+    (global-evil-surround-mode))
+
+;; evil org mode
+(use-package evil-org
+    :ensure t
+    :after org
+    :config
+    (add-hook 'org-mode-hook 'evil-org-mode)
+    (add-hook 'evil-org-mode-hook
+	    (lambda () (evil-org-set-key-theme))))
+
+(use-package evil-indent-textobject
+    :ensure t)
+
+(use-package evil-commentary
+    :ensure t
+    :config
+    (evil-commentary-mode))
+
+#+END_SRC
+
+** General
+#+BEGIN_SRC emacs-lisp
+  (use-package general :ensure t)
+   (general-evil-setup)
+
+#+END_SRC
+
+** Drag stuff
+#+BEGIN_SRC emacs-lisp
+  (use-package drag-stuff                 ;
+    :ensure t)
+  (drag-stuff-global-mode 1)
+  (global-set-key (kbd "M-C-k") 'drag-stuff-up)
+  (global-set-key (kbd "M-C-j") 'drag-stuff-down)
+
+#+END_SRC
+
+** Main evil keybindings
+#+BEGIN_SRC emacs-lisp
+    (general-define-key "M-o" 'other-window)
+    (evil-leader/set-leader ",")
+
+    (evil-leader/set-key
+	"f" 'projectile-command-map
+	"R" 'counsel-projectile-rg
+	"w" 'save-buffer
+	"v" 'evil-window-vsplit
+	"o" 'delete-other-windows
+	"k" 'kill-current-buffer
+	"s" 'avy-goto-word-1
+	"e" 'avy-goto-char-timer
+	"l" 'avy-goto-line
+	"b" 'ivy-switch-buffer
+	"D" 'deer
+	",b" 'bookmark-jump
+	",v" 'vue-mode
+	"c" 'org-capture
+	"." 'org-time-stamp
+	"a" 'org-agenda
+	"zf" 'fold-this
+	"Zf" 'fold-this-all
+	"za" 'fold-this-unfold-at-point
+	"Za" 'fold-this-unfold-all
+	"gr" 'my-revert-buffer
+	"gs" 'magit-status)
+
+    (defun my-revert-buffer ()
+      "Reload file from disk"
+      (interactive)
+      (revert-buffer t (not (buffer-modified-p)) t))
+
+#+END_SRC
+
+** Org-mode evil keybindings
+#+BEGIN_SRC emacs-lisp
+    (evil-leader/set-key-for-mode 'org-mode
+	"A" 'org-archive-subtree
+	",d" 'org-deadline
+	",s" 'org-schedule
+	"go" 'org-open-at-point
+	"gt" 'org-set-tags-command
+	"r" 'org-refile
+	"t" 'org-todo
+	",z" 'my-delete-capture-window
+	"z" 'my-save-and-close
+	)
+
+    (general-define-key
+	:keymaps 'org-mode-map
+	:states 'normal
+	"C-k" 'org-previous-visible-heading)
+
+    ;; open link on return in org-modes
+    (general-define-key
+	:keymaps 'org-mode-map
+	:states 'normal
+	"RET" 'org-open-at-point)
+   
+    (defun my-delete-capture-window ()
+      "Run `org-capture-kill' and `delete-frame' in sequence."
+      (interactive)
+      (org-capture-kill)
+      (delete-frame))
+
+  (defun my-save-and-close ()
+    "save and close org-capture frame"
+    (interactive)
+    (org-capture-finalize)
+    (delete-frame))
+#+END_SRC
+
+** Quit minibuffer on escape
+#+BEGIN_SRC emacs-lisp
+(defun minibuffer-keyboard-quit ()
+    (interactive)
+    (if (and delete-selection-mode transient-mark-mode mark-active)
+	(setq deactivate-mark  t)
+    (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
+    (abort-recursive-edit)))
+
+    (define-key evil-visual-state-map [escape] 'keyboard-quit)
+    (define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
+    (define-key minibuffer-local-ns-map [escape] 'minibuffer-keyboard-quit)
+    (define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
+    (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
+    (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
+#+END_SRC
+
+** ivy swiper counsel
+#+BEGIN_SRC emacs-lisp
+  (use-package smex ;; smart M-x
+    :ensure t)
+
+  (use-package ivy
+    :ensure t
+    :diminish ivy-mode
+    :config
+    (ivy-mode t))
+    
+  (setq ivy-initial-inputs-alist nil)
+  (setq ivy-use-virtual-buffers t)       ; extend searching to bookmarks and
+  (setq ivy-height 20)                   ; set height of the ivy window
+  (setq ivy-count-format "(%d/%d) ")     ; count format, from the ivy help page
+  (setq ivy-display-style 'fancy)
+  (setq ivy-format-function 'ivy-format-function-line) ; Make highlight extend all the way to the right
+  ;; TODO testing out the fuzzy search
+  (setq ivy-re-builders-alist
+        '((counsel-M-x . ivy--regex-fuzzy) ; Only counsel-M-x use flx fuzzy search
+          (t . ivy--regex-plus)))
+
+  (use-package counsel
+    :ensure t
+    :bind (("M-x" . counsel-M-x)))
+
+  (general-define-key
+   :states '(normal visual)
+   :prefix ","
+   "x" '(counsel-M-x :which-key "mycounsel"))
+
+  (use-package swiper
+    :ensure t)
+  (general-define-key
+   :states '(normal visual)
+   "/" '(swiper :which-key "swiper"))
+
+  (use-package ivy-hydra
+    :ensure t)
+
+#+END_SRC
+** Magit
+#+BEGIN_SRC emacs-lisp
+  (use-package magit
+    :config
+      (setq magit-repository-directories '(("~/Develop/" . 2) ("~/org/" . 1) ))) 
+  ;; evil-magit keybinding
+  (use-package evil-magit)
+  ;; optional: this is the evil state that evil-magit will use
+  (setq evil-magit-state 'normal)
+  ;; optional: disable additional bindings for yanking text
+  (setq evil-magit-use-y-for-yank nil)
+
+#+END_SRC
+   
