@@ -46,8 +46,10 @@
   (column-number-mode 1)
   (setq inhibit-startup-message t)
   (setq initial-scratch-message nil)
-  (set-frame-font "Anonymous Pro for Powerline-18:antialiasing=false")
-  ;; (set-frame-font "Iosevka-19:light:antialiasing=false")
+  ;; (set-frame-font "Anonymous Pro for Powerline-18:antialiasing=false")
+  ;; (set-frame-font "Consolas-18:antialiasing=false")
+  (set-frame-font "Input-18:antialiasing=false")
+  ;; (set-frame-font "Iosevka-18:light:antialiasing=false")
   ;; Disable backup/autosave files
   (setq make-backup-files        nil)
   (setq auto-save-default        nil)

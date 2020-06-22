@@ -1,4 +1,4 @@
-;;; package --- Sumary
+
 ;;; Commentary:
 ;; -*- coding: utf-8; lexical-binding: t; -*-
 ;; sample use of abbrev
@@ -57,8 +57,7 @@
     ("os3" "operating system")
 
     ;; programing
-    ("ra" "=>")
-    ("h" "------------------------------" nil 0)
+    ("=>" "=>")
 
     ;; regex
     ("xaz" "\\([A-Za-z0-9]+\\)")
