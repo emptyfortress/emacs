@@ -639,6 +639,62 @@
 
 #+END_SRC
 
+** Clocking
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Resume clocking task when emacs is restarted
+  (org-clock-persistence-insinuate)
+  ;;
+  ;; Show lot of clocking history so it's easy to pick items off the C-F11 list
+  (setq org-clock-history-length 20)
+  ;; Resume clocking task on clock-in if the clock is open
+  (setq org-clock-in-resume t)
+  ;; Change tasks to NEXT when clocking in
+  ;; (setq org-clock-in-switch-to-state 'bh/clock-in-to-next)
+  ;; Separate drawers for clocking and logs
+  (setq org-drawers (quote ("PROPERTIES" "LOGBOOK")))
+  ;; Save clock data and state changes and notes in the LOGBOOK drawer
+  (setq org-clock-into-drawer t)
+  ;; Sometimes I change tasks I'm clocking quickly - this removes clocked tasks with 0:00 duration
+  (setq org-clock-out-remove-zero-time-clocks t)
+  ;; Clock out when moving task to a done state
+  (setq org-clock-out-when-done t)
+  ;; Save the running clock and all clock history when exiting Emacs, load it on startup
+  (setq org-clock-persist t)
+  ;; Do not prompt to resume an active clock
+  ;; (setq org-clock-persist-query-resume nil)
+
+  ;; Enable auto clock resolution for finding open clocks
+  (setq org-clock-auto-clock-resolution (quote when-no-clock-is-running))
+  ;; Include current clocking task in clock reports
+  (setq org-clock-report-include-clocking-task t)
+
+  ;; The following setting makes time editing use discrete minute intervals (no rounding) increments
+  (setq org-time-stamp-rounding-minutes (quote (1 1)))
+
+  (evil-leader/set-key-for-mode 'org-mode
+    "I" 'org-clock-in
+    "O" 'org-clock-out
+    "L" 'org-clock-in-last
+    "J" 'org-clock-goto
+    "X" 'org-clock-cancel
+    "Z" 'org-resolve-clocks
+    "E" 'org-clock-report
+    "dis" 'org-clock-display
+    )
+
+  (general-define-key
+   :states '(normal)
+   :prefix ","
+   "i" #'counsel-org-clock-goto)
+
+  (general-define-key
+   :states '(normal)
+   :prefix ","
+   "j" #'counsel-org-clock-context)
+
+#+END_SRC
+
 ** Vue
 #+BEGIN_SRC emacs-lisp
   (use-package vue-mode
@@ -860,6 +916,7 @@ package show feedback on evil edit code
 #+BEGIN_SRC emacs-lisp
   (require 'expand-region)
   (key-chord-define-global "vv"  'er/expand-region)
+  (key-chord-define-global "ss"  'avy-goto-char-2)
 
 #+END_SRC
 
@@ -888,10 +945,442 @@ package show feedback on evil edit code
 
 #+END_SRC
 
+** Chrome capture
+#+BEGIN_SRC emacs-lisp
+  (require 'org-capture)
+  (require 'org-protocol)
+  (server-start)
 
+#+END_SRC
+
+** flycheck
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck
+    :ensure t
+    :init (global-flycheck-mode))
+
+  ;; turn on flychecking globally
+  (add-hook 'after-init-hook #'global-flycheck-mode)
+  (setq flycheck-check-syntax-automatically '(mode-enabled save))
+
+        (general-define-key
+         :states 'normal
+         :prefix ","
+         "f n" 'flycheck-next-error)
+
+#+END_SRC
+
+** environment
+#+BEGIN_SRC emacs-lisp
+  (use-package exec-path-from-shell)
+  (when (memq window-system '(mac ns))
+    (exec-path-from-shell-initialize))
+#+END_SRC
 
 ** Avy
 #+BEGIN_SRC emacs-lisp
   ;; (use-package avy :ensure t
   ;;   :commands (avy-goto-word-1))
+#+END_SRC
+
+** prettier
+#+BEGIN_SRC emacs-lisp
+  ;;       (require 'prettier-js)
+
+  ;;        (add-hook 'js2-mode-hook 'prettier-js-mode)
+  ;;        (add-hook 'web-mode-hook 'prettier-js-mode)
+  ;;        (add-hook 'vue-mode-hook 'prettier-js-mode)
+
+  ;;   (eval-after-load 'web-mode
+  ;;       '(progn
+  ;;          (add-hook 'web-mode-hook #'add-node-modules-path)
+  ;;          (add-hook 'web-mode-hook #'prettier-js-mode)))
+
+  ;;   (eval-after-load 'vue-mode
+  ;;       '(progn
+  ;;          (add-hook 'vue-mode-hook #'add-node-modules-path)
+  ;;          (add-hook 'vue-mode-hook #'prettier-js-mode)))
+
+  ;; (defun maybe-use-prettier ()
+  ;;   "Enable prettier-js-mode if an rc file is located."
+  ;;   (if (locate-dominating-file default-directory ".prettierrc")
+  ;;       (prettier-js-mode +1)))
+
+  ;;   (add-hook 'vue-mode-hook 'maybe-use-prettier)
+  ;;   (add-hook 'js2-mode-hook 'maybe-use-prettier)
+#+END_SRC
+
+** rotate text
+#+BEGIN_SRC emacs-lisp
+  (defvar rotate-text-rotations
+    '(("true" "false")
+      ("left" "right" "top" "bottom")
+      ("width" "height")
+      ("margin" "padding")
+      ("pointer" "default" "arrow")
+      ("block" "inline-box" "flex" "inline")
+      ("relative" "absolute" "fixed" "static")
+      ("yes" "no"))
+    "List of text rotation sets.")
+
+  (defun rotate-region (beg end)
+    "Rotate all matches in `rotate-text-rotations' between point and mark."
+    (interactive "r")
+    (let ((regexp (rotate-convert-rotations-to-regexp
+                   rotate-text-rotations))
+          (end-mark (copy-marker end)))
+      (save-excursion
+        (goto-char beg)
+        (while (re-search-forward regexp (marker-position end-mark) t)
+          (let* ((found (match-string 0))
+                 (replace (rotate-next found)))
+            (replace-match replace))))))
+
+  (defun rotate-string (string &optional rotations)
+    "Rotate all matches in STRING using associations in ROTATIONS.
+      If ROTATIONS are not given it defaults to `rotate-text-rotations'."
+    (let ((regexp (rotate-convert-rotations-to-regexp
+                   (or rotations rotate-text-rotations)))
+          (start 0))
+      (while (string-match regexp string start)
+        (let* ((found (match-string 0 string))
+               (replace (rotate-next
+                         found
+                         (or rotations rotate-text-rotations))))
+          (setq start (+ (match-end 0)
+                         (- (length replace) (length found))))
+          (setq string (replace-match replace nil t string))))
+      string))
+
+  (defun rotate-next (string &optional rotations)
+    "Return the next element after STRING in ROTATIONS."
+    (let ((rots (rotate-get-rotations-for
+                 string
+                 (or rotations rotate-text-rotations))))
+      (if (> (length rots) 1)
+          (error (format "Ambiguous rotation for %s" string))
+        (if (< (length rots) 1)
+            ;; If we get this far, this should not occur:
+            (error (format "Unknown rotation for %s" string))
+          (let ((occurs-in-rots (member string (car rots))))
+            (if (null occurs-in-rots)
+                ;; If we get this far, this should *never* occur:
+                (error (format "Unknown rotation for %s" string))
+              (if (null (cdr occurs-in-rots))
+                  (caar rots)
+                (cadr occurs-in-rots))))))))
+
+  (defun rotate-get-rotations-for (string &optional rotations)
+    "Return the string rotations for STRING in ROTATIONS."
+    (remq nil (mapcar (lambda (rot) (if (member string rot) rot))
+                      (or rotations rotate-text-rotations))))
+
+  (defun rotate-convert-rotations-to-regexp (rotations)
+    (regexp-opt (rotate-flatten-list rotations)))
+
+  (defun rotate-flatten-list (list-of-lists)
+    "Flatten LIST-OF-LISTS to a single list.
+      Example:
+        (rotate-flatten-list '((a b c) (1 ((2 3)))))
+          => (a b c 1 2 3)"
+    (if (null list-of-lists)
+        list-of-lists
+      (if (listp list-of-lists)
+          (append (rotate-flatten-list (car list-of-lists))
+                  (rotate-flatten-list (cdr list-of-lists)))
+        (list list-of-lists))))
+
+  (defun rotate-word-at-point ()
+    "Rotate word at point based on sets in `rotate-text-rotations'."
+    (interactive)
+    (let ((bounds (bounds-of-thing-at-point 'word))
+          (opoint (point)))
+      (when (consp bounds)
+        (let ((beg (car bounds))
+              (end (copy-marker (cdr bounds))))
+          (rotate-region beg end)
+          (goto-char (if (> opoint end) end opoint))))))
+
+  ;; (global-set-key "\C-c/" 'rotate-word-at-point)
+  (general-nmap "gs" 'rotate-word-at-point)
+
+  (defun indent-or-rotate ()
+    "If point is at end of a word, then else indent the line."
+    (interactive)
+    (if (looking-at "\\>")
+        (rotate-region (save-excursion (forward-word -1) (point))
+                       (point))
+      (indent-for-tab-command)))
+
+  (local-set-key [tab] 'indent-or-rotate) 
+#+END_SRC
+
+** visual-regexp-steroids
+#+BEGIN_SRC emacs-lisp
+  (use-package visual-regexp :ensure t)
+  (use-package visual-regexp-steroids :ensure t)
+  (define-key global-map (kbd "C-c r") 'vr/replace)
+  (define-key global-map (kbd "C-c q") 'vr/query-replace)
+  (general-define-key
+    :states 'normal
+    :prefix ","
+    "/r" 'vr/replace
+    "/q" 'vr/query-replace)
+  ;; replace command -- change all at once
+  ;; query command -- ask on every case
+#+END_SRC
+
+** emojify
+#+BEGIN_SRC emacs-lisp
+  (use-package emojify :ensure t)
+  (add-hook 'after-init-hook #'global-emojify-mode) ;; add emojify 
+#+END_SRC
+
+:smile:
+** winner mode
+# this is mode to switch to prev windows congiguration
+#+BEGIN_SRC emacs-lisp
+  (when (fboundp 'winner-mode)
+      (winner-mode 1))
+
+  (defhydra hydra-winner 
+    (global-map "<f5>")
+    "winner"
+    ("h" winner-undo)
+    ("l" winner-redo))
+
+#+END_SRC
+
+** custom agenda views
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-custom-commands
+        '(("n" "Agenda and all todo" 
+           ((agenda "")
+            (alltodo ""
+                     ((org-agenda-skip-function
+                       '(org-agenda-skip-entry-if 'todo '("FOO"))
+                       ))
+                     )))
+          ("w" "Waiting state" 
+           ((agenda "")
+            (todo "WAITING")))
+          ("d" "Upcoming deadlines" agenda ""
+           ((org-agenda-entry-types '(:deadline))
+            ;; a slower way to do the same thing
+            ;; (org-agenda-skip-function '(org-agenda-skip-entry-if 'notdeadline))
+            (org-agenda-span 1)
+            (org-deadline-warning-days 60)
+            (org-agenda-time-grid nil)))
+          ("f" "foo" 
+           ((todo "FOO")))
+          ("b" "buy" 
+           ((tags "buy")))
+          ("A" "Archive search" search ""
+           ((org-agenda-files (file-expand-wildcards "~/Develop/org/*.org_archive"))))
+          )
+        )
+
+#+END_SRC
+** smerge
+Documentation can be found here:
+https://github.com/alphapapa/unpackaged.el#smerge-mode
+
+#+BEGIN_SRC emacs-lisp
+  (use-package smerge-mode
+    :after hydra
+    :config
+    (defhydra unpackaged/smerge-hydra
+      (:color pink :hint nil :post (smerge-auto-leave))
+      "
+  ^Move^       ^Keep^               ^Diff^                 ^Other^
+  ^^-----------^^-------------------^^---------------------^^-------
+  _n_ext       _b_ase               _<_: upper/base        _C_ombine
+  _p_rev       _u_pper              _=_: upper/lower       _r_esolve
+  ^^           _l_ower              _>_: base/lower        _k_ill current
+  ^^           _a_ll                _R_efine
+  ^^           _RET_: current       _E_diff
+  "
+      ("n" smerge-next)
+      ("p" smerge-prev)
+      ("b" smerge-keep-base)
+      ("u" smerge-keep-upper)
+      ("l" smerge-keep-lower)
+      ("a" smerge-keep-all)
+      ("RET" smerge-keep-current)
+      ("\C-m" smerge-keep-current)
+      ("<" smerge-diff-base-upper)
+      ("=" smerge-diff-upper-lower)
+      (">" smerge-diff-base-lower)
+      ("R" smerge-refine)
+      ("E" smerge-ediff)
+      ("C" smerge-combine-with-next)
+      ("r" smerge-resolve)
+      ("k" smerge-kill-current)
+      ("ZZ" (lambda ()
+              (interactive)
+              (save-buffer)
+              (bury-buffer))
+       "Save and bury buffer" :color blue)
+      ("q" nil "cancel" :color blue))
+    :hook (magit-diff-visit-file . (lambda ()
+                                     (when smerge-mode
+                                       (unpackaged/smerge-hydra/body)))))
+
+#+END_SRC
+
+** kill-ring
+#+BEGIN_SRC emacs-lisp
+  (defun my-paste-inside-delimiters ()
+    "Select text between the nearest left and right delimiters.
+    and yank value from kill-ring."
+    (interactive)
+    (let (
+          ($skipChars
+           (if (boundp 'xah-brackets)
+               (concat "^\"" xah-brackets)
+             "^\"\\'<>(){}[]“”‘’‹›«»「」『』【】〖〗《》〈〉〔〕（）"))
+          $pos)
+      (skip-chars-backward $skipChars)
+      (setq $pos (point))
+      (skip-chars-forward $skipChars)
+      (set-mark $pos)
+      (delete-active-region)
+      (yank)))
+  (general-define-key
+   :states 'normal
+   "M-y" 'my-paste-inside-delimiters)
+
+  (general-define-key
+   :states 'normal
+   "M-p" 'counsel-yank-pop)
+
+#+END_SRC
+
+** engine-mode
+#+BEGIN_SRC emacs-lisp
+    (use-package engine-mode :ensure t)
+    (engine-mode t)
+
+    (defengine duckduckgo
+      "https://duckduckgo.com/?q=%s"
+      :keybinding "d")
+
+    (defengine github
+      "https://github.com/search?ref=simplesearch&q=%s"
+        :keybinding "h")
+
+    (defengine google
+      "http://www.google.com/search?ie=utf-8&oe=utf-8&q=%s"
+      :keybinding "g")
+
+    (defengine stack-overflow
+      "https://stackoverflow.com/search?q=%s"
+      :keybinding "s")
+
+  (general-define-key
+    :states 'normal
+    :prefix ","
+    "/g" 'engine/search-google)
+
+  (general-define-key
+    :states 'normal
+    :prefix ","
+    "/s" 'engine/search-stack-overflow)
+
+  (general-define-key
+    :states 'normal
+    :prefix ","
+    "/h" 'engine/search-github)
+#+END_SRC
+
+** org-roam
+#+BEGIN_SRC emacs-lisp
+  (use-package org-roam
+      :ensure t
+      :hook
+      (after-init . org-roam-mode)
+      :custom
+      (org-roam-directory "~/Dropbox/org")
+      :bind (:map org-roam-mode-map
+              (("C-c n l" . org-roam)
+                ("C-c n f" . org-roam-find-file)
+                ("C-c n j" . org-roam-jump-to-index)
+                ("C-c n b" . org-roam-switch-to-buffer)
+                ("C-c n g" . org-roam-graph))
+              :map org-mode-map
+              (("C-c n i" . org-roam-insert))
+              (("C-c n c" . org-roam-capture))))
+
+  (setq org-roam-completion-system 'ivy)
+  (require 'org-roam-protocol)
+
+  (setq org-roam-capture-templates '(
+    ("d" "default" plain (function org-roam--capture-get-point)
+        "%?\n"
+        :file-name "roam/%<%Y%m%d%H%M%S>-${slug}"
+        :head "#+TITLE: ${title}\n#+TAGS: "
+        :unnarrowed t)
+    ("a" "aaron" plain (function org-roam--capture-get-point)
+        "%?"
+        :file-name "%<%Y%m%d%H%M%S>-${slug}"
+        :head "#+title: ${title}\n"
+        :unnarrowed t)
+  ))
+
+  (setq org-roam-capture-ref-templates
+          '(("r" "ref" plain (function org-roam-capture--get-point)
+             ""
+             :file-name "roam/${slug}"
+             :head "#+TITLE: ${title}\n#+DATE: %<%Y-%m-%d>\n#+ROAM_KEY: ${ref}\n#+CATEGORY: website\n"
+             :unnarrowed t)
+            ("b" "bookends" plain (function org-roam-capture--get-point)
+             "- tags :: [[open-ext:bookends://sonnysoftware.com/${bid}][Bookends link]]\n- reference :: ${fcite}\n\n%?"
+             :file-name "${slug}"
+             :head "#+TITLE: ${title}\n#+DATE: %<%Y-%m-%d>\n#+ROAM_KEY: ${ref}\n\
+  ,#+BID: ${bid}\n#+PDF_FILE: ${pdf}\n#+CATEGORY: article\n\n"
+             :unnarrowed t
+             :immediate-finish t)))
+#+END_SRC
+
+** deft
+#+BEGIN_SRC emacs-lisp
+
+  (use-package deft
+    :ensure t
+    :bind ("<f8>" . deft)
+    :commands (deft)
+    :config (setq deft-directory "~/Dropbox/org"
+                  deft-extensions '("md" "org")
+                  deft-use-filename-as-title t
+                  deft-recursive t))
+  (evil-set-initial-state 'deft-mode 'emacs)
+
+  (use-package zetteldeft
+    :ensure t
+    :after deft)
+
+  (general-define-key
+    :prefix ","
+    :non-normal-prefix "C-SPC"
+    :states '(normal visual motion emacs)
+    :keymaps 'override
+    "d"  '(nil :wk "deft")
+    "dd" '(deft :wk "deft")
+    "dD" '(zetteldeft-deft-new-search :wk "new search")
+    "dR" '(deft-refresh :wk "refresh")
+    "ds" '(zetteldeft-search-at-point :wk "search at point")
+    "dc" '(zetteldeft-search-current-id :wk "search current id")
+    "df" '(zetteldeft-follow-link :wk "follow link")
+    "dF" '(zetteldeft-avy-file-search-ace-window :wk "avy file other window")
+    "dl" '(zetteldeft-avy-link-search :wk "avy link search")
+    "dt" '(zetteldeft-avy-tag-search :wk "avy tag search")
+    "dT" '(zetteldeft-tag-buffer :wk "tag list")
+    "di" '(zetteldeft-find-file-id-insert :wk "insert id")
+    "dI" '(zetteldeft-find-file-full-title-insert :wk "insert full title")
+    "do" '(zetteldeft-find-file :wk "find file")
+    "dn" '(zetteldeft-new-file :wk "new file")
+    "dN" '(zetteldeft-new-file-and-link :wk "new file & link")
+    "dr" '(zetteldeft-file-rename :wk "rename")
+    "dx" '(zetteldeft-count-words :wk "count words"))
+
 #+END_SRC
