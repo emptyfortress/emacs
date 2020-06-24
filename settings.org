@@ -1361,6 +1361,10 @@ https://github.com/alphapapa/unpackaged.el#smerge-mode
     :ensure t
     :after deft)
 
+  ;; (setq zetteldeft-link-indicator "[["
+  ;;       zetteldeft-link-suffix "]]")
+  ;; (setq zetteldeft-title-prefix "# ")
+
   (general-define-key
     :prefix ","
     :non-normal-prefix "C-SPC"
@@ -1386,3 +1390,21 @@ https://github.com/alphapapa/unpackaged.el#smerge-mode
     "dx" '(zetteldeft-count-words :wk "count words"))
 
 #+END_SRC
+
+** org-download
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org-download 
+    :ensure t
+    :init
+    (setq org-download-screenshot-method "screencapture -i %s")
+    (setq org-download-method 'directory) 
+    (setq-default org-download-image-dir "/Users/admin/Dropbox/org/img")
+    (setq org-image-actual-width nil)
+    ;; (setq org-download-attr-list '("#+attr_org: :width 256px" "#+caption:" "#+NAME: fig:" ))
+  )
+
+
+#+END_SRC
+
+

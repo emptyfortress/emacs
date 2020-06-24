@@ -16,8 +16,9 @@
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
    '("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" default))
+ '(org-roam-directory "~/Dropbox/org")
  '(package-selected-packages
-   '(ace-window expand-region company ranger git-gutter evil-magit magit avy gruvbox-theme org)))
+   '(org-download ace-window expand-region company ranger git-gutter evil-magit magit avy gruvbox-theme org)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

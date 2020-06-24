@@ -14,7 +14,6 @@
     ("readme" "New readme text added.")
     ("fx" "Some small fixes added. Not so important.")
     ("clean" "Clean code from blanks line and comments.")
-    ("css" "css visual changes.")
 
     ;; net abbrev
     ("afaik" "as far as i know")
