@@ -549,8 +549,7 @@
           ("read" . ?r)
           ("emacs" . ?e)
           ("refile" . ?f)
-	  ("code" . ?c)
-	  ;; ("article" . ?a)
+          ("code" . ?c)
           ("movie" . ?m)))
 
   ;; this for prettify orgmode
