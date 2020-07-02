@@ -471,7 +471,6 @@
   (defvar gtd (gtd-path "gtd.org"))
   (defvar foo (gtd-path "foo.org"))
   (defvar journal (gtd-path "journal.org"))
-  (defvar roam (gtd-path "roam/"))
   (defvar someday (gtd-path "someday.org"))
   (defvar tickler (gtd-path "tickler.org"))
   (defvar ref (gtd-path "ref.org"))
@@ -484,7 +483,6 @@
                              (inbox :maxlevel . 5)
                              (foo :maxlevel . 2)
                              (journal :maxlevel . 2)
-                             (roam :maxlevel . 2)
                              (gtd :maxlevel . 2)
                              (someday :maxlevel . 5)
                              (tickler :maxlevel . 5)))
@@ -496,15 +494,14 @@
   (setq org-agenda-todo-ignore-deadlines 'all) ;; ignore deadlines in todo list
   (setq calendar-week-start-day 1)
 
-      ;; set custom agenda view
-      ;; (setq org-agenda-custom-commands
-      ;;       '(("f" "Ideas" todo "FOO")
-      ;;       ("b" "Купить" tags "buy")))
+  ;; set custom agenda view
+  (setq org-agenda-custom-commands
+        '(("f" "Ideas" todo "FOO")
+        ("b" "Купить" tags "buy")))
 
   (defvar inbox-capture-template "* %i%?\n%U\n")
   (defvar todo-capture-template "* TODO %i%?          \n%U\n%a\n")
   (defvar tickler-capture-template "* %i%?\n%U\n")
-  (defvar fix-capture-template "* BUG %i%?\n%U\n%a\n")
   (defvar keys-capture-template "* aa%?")
 
   ;; this is something with capture links, I think
@@ -521,7 +518,6 @@
                                 ("f" "Foo" entry (file+headline foo "ideas") "* FOO %i%?")
                                 ("k" "Keys" entry (file+headline keys "Keys") ,keys-capture-template)
                                 ("n" "Note" entry (file ref) ,inbox-capture-template)
-                                ("B" "Bug" entry (file+headline gtd "Bugs"),fix-capture-template)
                                 ("j" "Journal" entry (file+olp+datetree "~/Develop/org/journal.org") "**** %<%H:%M> - %?\n%a\n" :tree-type week)
                                 ("p" "Protocol" entry (file inbox) 
                                       "* %?\n%u\n\n%a\n \n%i\n")
@@ -917,7 +913,7 @@ package show feedback on evil edit code
 #+BEGIN_SRC emacs-lisp
   (require 'expand-region)
   (key-chord-define-global "vv"  'er/expand-region)
-  (key-chord-define-global "ss"  'avy-goto-char-2)
+  ;; (key-chord-define-global "ii"  'avy-goto-char-2)
 
 #+END_SRC
 
@@ -1183,6 +1179,7 @@ package show feedback on evil edit code
 
 #+END_SRC
 ** smerge
+
 Documentation can be found here:
 https://github.com/alphapapa/unpackaged.el#smerge-mode
 
@@ -1404,6 +1401,6 @@ https://github.com/alphapapa/unpackaged.el#smerge-mode
   )
 
 
-#+END_SRC
 
+#+END_SRC
 
