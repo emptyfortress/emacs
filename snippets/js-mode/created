@@ -1,0 +1,13 @@
+# -*- mode: snippet -*-
+# name: created
+# key: created
+# condition: (looking-back "^\t+created" nil)
+# expand-env: ((yas-indent-line 'fixed))
+# --
+created () {
+	axios.get('/history.json')
+		.then(response => {
+			this.posts = response.data
+		})
+	this.setfocus()
+},

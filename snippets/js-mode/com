@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: com
+# key: com
+# condition: (looking-back "^\t+com" nil)
+# expand-env: ((yas-indent-line 'fixed))
+# --
+components: {
+	${1:name},
+}$0

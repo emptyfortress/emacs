@@ -1,8 +1,10 @@
 # -*- mode: snippet -*-
 # name: property
 # key: pr
+# condition: (looking-back "^\t+pr" nil)
+# expand-env: ((yas-indent-line 'fixed))
 # --
 
-${1:prop} () {
+${1:property} () {
 	$0
 },

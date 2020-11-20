@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: add
+# key: add
+# --
+# condition: (looking-back "^\t+created" nil)
+# expand-env: ((yas-indent-line 'fixed))$0

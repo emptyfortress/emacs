@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: time
+# key: time
+# condition: (looking-back "^\t+time" nil)
+# expand-env: ((yas-indent-line 'fixed))
+# --
+let that = this
+setTimeout(function() {
+	$0
+},500)

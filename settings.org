@@ -75,59 +75,59 @@
 
 ** Evil mode
 #+BEGIN_SRC emacs-lisp
-;; (use-package evil
-;;   :ensure t ;; install the evil package if not installed
-;;   :init ;; tweak evil's configuration before loading it
-;;    (setq evil-search-module 'evil-search)
-;;    (setq evil-ex-complete-emacs-commands nil)
-;;    (setq evil-vsplit-window-right t)
-;;    (setq evil-split-window-below t)
-;;    (setq evil-shift-round nil)
-;;    (setq evil-want-C-u-scroll t)
-;;   :config ;; tweak evil after loading it
-;;   (evil-mode 1))
+  ;; (use-package evil
+  ;;   :ensure t ;; install the evil package if not installed
+  ;;   :init ;; tweak evil's configuration before loading it
+  ;;    (setq evil-search-module 'evil-search)
+  ;;    (setq evil-ex-complete-emacs-commands nil)
+  ;;    (setq evil-vsplit-window-right t)
+  ;;    (setq evil-split-window-below t)
+  ;;    (setq evil-shift-round nil)
+  ;;    (setq evil-want-C-u-scroll t)
+  ;;   :config ;; tweak evil after loading it
+  ;;   (evil-mode 1))
 
-(use-package evil
-    :ensure t
-    :init
-    (setq evil-want-integration t)
-    (setq evil-want-keybinding nil)
-    (setq evil-vsplit-window-right t)
-    :config
-    (evil-mode 1))
+  (use-package evil
+      :ensure t
+      :init
+      (setq evil-want-integration t)
+      (setq evil-want-keybinding nil)
+      (setq evil-vsplit-window-right t)
+      :config
+      (evil-mode 1))
 
-(use-package evil-collection
-    :after evil
-    :ensure t
-    :config
-    (evil-collection-init))
+  (use-package evil-collection
+      :after evil
+      :ensure t
+      :config
+      (evil-collection-init))
 
-(use-package evil-leader
-    :ensure t
-    :config
-    (global-evil-leader-mode))
+  (use-package evil-leader
+      :ensure t
+      :config
+      (global-evil-leader-mode))
 
-(use-package evil-surround
-    :ensure t
-    :config
-    (global-evil-surround-mode))
+  (use-package evil-surround
+      :ensure t
+      :config
+      (global-evil-surround-mode))
 
-;; evil org mode
-(use-package evil-org
-    :ensure t
-    :after org
-    :config
-    (add-hook 'org-mode-hook 'evil-org-mode)
-    (add-hook 'evil-org-mode-hook
-	    (lambda () (evil-org-set-key-theme))))
+  ;; evil org mode
+  (use-package evil-org
+      :ensure t
+      :after org
+      :config
+      (add-hook 'org-mode-hook 'evil-org-mode)
+      (add-hook 'evil-org-mode-hook
+              (lambda () (evil-org-set-key-theme))))
 
-(use-package evil-indent-textobject
-    :ensure t)
+  (use-package evil-indent-textobject
+      :ensure t)
 
-(use-package evil-commentary
-    :ensure t
-    :config
-    (evil-commentary-mode))
+  (use-package evil-commentary
+      :ensure t
+      :config
+      (evil-commentary-mode))
 
 #+END_SRC
 
@@ -170,10 +170,6 @@
 	"c" 'org-capture
 	"." 'org-time-stamp
 	"a" 'org-agenda
-	"zf" 'fold-this
-	"Zf" 'fold-this-all
-	"za" 'fold-this-unfold-at-point
-	"Za" 'fold-this-unfold-all
 	"gr" 'my-revert-buffer
 	"gs" 'magit-status)
 
@@ -460,7 +456,7 @@
    (change-cursor-mode 1) ; Turn on change for overwrite, read-only, and input mode
 #+END_SRC
 
-** orgmode
+** Orgmode
 #+BEGIN_SRC emacs-lisp
   (use-package org
     :ensure org-plus-contrib)
@@ -692,15 +688,6 @@
 
 #+END_SRC
 
-** Vue
-#+BEGIN_SRC emacs-lisp
-  (use-package vue-mode
-    :ensure t)
-  (add-hook 'mmm-mode-hook
-            (lambda ()
-              (set-face-background 'mmm-default-submode-face nil)))
-#+END_SRC
-  
 ** JScript
 #+BEGIN_SRC emacs-lisp
   (use-package js
@@ -745,6 +732,7 @@
   ;; Language-Specific Tweaks
   (setq-default python-indent-offset custom-tab-width) ;; Python
   (setq-default js-indent-level custom-tab-width)      ;; Javascript
+  (setq-default typescript-indent-level custom-tab-width)      ;; Javascript
 
   ;; Making electric-indent behave sanely
   (setq-default electric-indent-inhibit t)
@@ -757,6 +745,7 @@
   ;; For the vim-like motions of ">>" and "<<".
   (setq-default evil-shift-width custom-tab-width)
   (setq pug-tab-width 2)
+  (setq css-indent-offset 2)
   ;; WARNING: This will change your life
   ;; (OPTIONAL) Visualize tabs as a pipe character - "|"
   ;; This will also show trailing characters as they are useful to spot.
@@ -952,18 +941,30 @@ package show feedback on evil edit code
 
 ** flycheck
 #+BEGIN_SRC emacs-lisp
-  (use-package flycheck
-    :ensure t
-    :init (global-flycheck-mode))
+        (use-package flycheck
+          :ensure t
+          :init (global-flycheck-mode))
 
-  ;; turn on flychecking globally
-  (add-hook 'after-init-hook #'global-flycheck-mode)
-  (setq flycheck-check-syntax-automatically '(mode-enabled save))
+        ;; turn on flychecking globally
+        (add-hook 'after-init-hook #'global-flycheck-mode)
+        (setq flycheck-check-syntax-automatically '(mode-enabled save))
 
-        (general-define-key
-         :states 'normal
-         :prefix ","
-         "f n" 'flycheck-next-error)
+              (general-define-key
+               :states 'normal
+               :prefix ","
+               "f n" 'flycheck-next-error)
+
+      ;; fix file and revert
+
+(defun eslint-fix-file ()
+  (interactive)
+  (message "eslint --fixing the file" (buffer-file-name))
+  (shell-command (concat "eslint --fix " (buffer-file-name))))
+
+(defun eslint-fix-file-and-revert ()
+  (interactive)
+  (eslint-fix-file)
+  (revert-buffer t t))
 
 #+END_SRC
 
@@ -1293,114 +1294,149 @@ https://github.com/alphapapa/unpackaged.el#smerge-mode
 
 ** org-roam
 #+BEGIN_SRC emacs-lisp
-  (use-package org-roam
-      :ensure t
-      :hook
-      (after-init . org-roam-mode)
-      :custom
-      (org-roam-directory "~/Dropbox/org")
-      :bind (:map org-roam-mode-map
-              (("C-c n l" . org-roam)
-                ("C-c n f" . org-roam-find-file)
-                ("C-c n j" . org-roam-jump-to-index)
-                ("C-c n b" . org-roam-switch-to-buffer)
-                ("C-c n g" . org-roam-graph))
-              :map org-mode-map
-              (("C-c n i" . org-roam-insert))
-              (("C-c n c" . org-roam-capture))))
+  ;; (use-package org-roam
+  ;;     :ensure t
+  ;;     :hook
+  ;;     (after-init . org-roam-mode)
+  ;;     :custom
+  ;;     (org-roam-directory "~/Dropbox/org")
+  ;;     :bind (:map org-roam-mode-map
+  ;;             (("C-c n l" . org-roam)
+  ;;               ("C-c n f" . org-roam-find-file)
+  ;;               ("C-c n j" . org-roam-jump-to-index)
+  ;;               ("C-c n b" . org-roam-switch-to-buffer)
+  ;;               ("C-c n g" . org-roam-graph))
+  ;;             :map org-mode-map
+  ;;             (("C-c n i" . org-roam-insert))
+  ;;             (("C-c n c" . org-roam-capture))))
 
-  (setq org-roam-completion-system 'ivy)
-  (require 'org-roam-protocol)
+  ;; (setq org-roam-completion-system 'ivy)
+  ;; (require 'org-roam-protocol)
 
-  (setq org-roam-capture-templates '(
-    ("d" "default" plain (function org-roam--capture-get-point)
-        "%?\n"
-        :file-name "roam/%<%Y%m%d%H%M%S>-${slug}"
-        :head "#+TITLE: ${title}\n#+TAGS: "
-        :unnarrowed t)
-    ("a" "aaron" plain (function org-roam--capture-get-point)
-        "%?"
-        :file-name "%<%Y%m%d%H%M%S>-${slug}"
-        :head "#+title: ${title}\n"
-        :unnarrowed t)
-  ))
+  ;; (setq org-roam-capture-templates '(
+  ;;   ("d" "default" plain (function org-roam--capture-get-point)
+  ;;       "%?\n"
+  ;;       :file-name "roam/%<%Y%m%d%H%M%S>-${slug}"
+  ;;       :head "#+TITLE: ${title}\n#+TAGS: "
+  ;;       :unnarrowed t)
+  ;;   ("a" "aaron" plain (function org-roam--capture-get-point)
+  ;;       "%?"
+  ;;       :file-name "%<%Y%m%d%H%M%S>-${slug}"
+  ;;       :head "#+title: ${title}\n"
+  ;;       :unnarrowed t)
+  ;; ))
 
-  (setq org-roam-capture-ref-templates
-          '(("r" "ref" plain (function org-roam-capture--get-point)
-             ""
-             :file-name "roam/${slug}"
-             :head "#+TITLE: ${title}\n#+DATE: %<%Y-%m-%d>\n#+ROAM_KEY: ${ref}\n#+CATEGORY: website\n"
-             :unnarrowed t)
-            ("b" "bookends" plain (function org-roam-capture--get-point)
-             "- tags :: [[open-ext:bookends://sonnysoftware.com/${bid}][Bookends link]]\n- reference :: ${fcite}\n\n%?"
-             :file-name "${slug}"
-             :head "#+TITLE: ${title}\n#+DATE: %<%Y-%m-%d>\n#+ROAM_KEY: ${ref}\n\
-  ,#+BID: ${bid}\n#+PDF_FILE: ${pdf}\n#+CATEGORY: article\n\n"
-             :unnarrowed t
-             :immediate-finish t)))
+  ;; (setq org-roam-capture-ref-templates
+  ;;         '(("r" "ref" plain (function org-roam-capture--get-point)
+  ;;            ""
+  ;;            :file-name "roam/${slug}"
+  ;;            :head "#+TITLE: ${title}\n#+DATE: %<%Y-%m-%d>\n#+ROAM_KEY: ${ref}\n#+CATEGORY: website\n"
+  ;;            :unnarrowed t)
+  ;;           ("b" "bookends" plain (function org-roam-capture--get-point)
+  ;;            "- tags :: [[open-ext:bookends://sonnysoftware.com/${bid}][Bookends link]]\n- reference :: ${fcite}\n\n%?"
+  ;;            :file-name "${slug}"
+  ;;            :head "#+TITLE: ${title}\n#+DATE: %<%Y-%m-%d>\n#+ROAM_KEY: ${ref}\n\
+  ;; #+BID: ${bid}\n#+PDF_FILE: ${pdf}\n#+CATEGORY: article\n\n"
+  ;;            :unnarrowed t
+  ;;            :immediate-finish t)))
 #+END_SRC
 
 ** deft
 #+BEGIN_SRC emacs-lisp
 
-  (use-package deft
-    :ensure t
-    :bind ("<f8>" . deft)
-    :commands (deft)
-    :config (setq deft-directory "~/Dropbox/org"
-                  deft-extensions '("md" "org")
-                  deft-use-filename-as-title t
-                  deft-recursive t))
-  (evil-set-initial-state 'deft-mode 'emacs)
+  ;; (use-package deft
+  ;;   :ensure t
+  ;;   :bind ("<f8>" . deft)
+  ;;   :commands (deft)
+  ;;   :config (setq deft-directory "~/Dropbox/org"
+  ;;                 deft-extensions '("md" "org")
+  ;;                 deft-use-filename-as-title t
+  ;;                 deft-recursive t))
+  ;; (evil-set-initial-state 'deft-mode 'emacs)
 
-  (use-package zetteldeft
-    :ensure t
-    :after deft)
+  ;; (use-package zetteldeft
+  ;;   :ensure t
+  ;;   :after deft)
 
-  ;; (setq zetteldeft-link-indicator "[["
-  ;;       zetteldeft-link-suffix "]]")
-  ;; (setq zetteldeft-title-prefix "# ")
-
-  (general-define-key
-    :prefix ","
-    :non-normal-prefix "C-SPC"
-    :states '(normal visual motion emacs)
-    :keymaps 'override
-    "d"  '(nil :wk "deft")
-    "dd" '(deft :wk "deft")
-    "dD" '(zetteldeft-deft-new-search :wk "new search")
-    "dR" '(deft-refresh :wk "refresh")
-    "ds" '(zetteldeft-search-at-point :wk "search at point")
-    "dc" '(zetteldeft-search-current-id :wk "search current id")
-    "df" '(zetteldeft-follow-link :wk "follow link")
-    "dF" '(zetteldeft-avy-file-search-ace-window :wk "avy file other window")
-    "dl" '(zetteldeft-avy-link-search :wk "avy link search")
-    "dt" '(zetteldeft-avy-tag-search :wk "avy tag search")
-    "dT" '(zetteldeft-tag-buffer :wk "tag list")
-    "di" '(zetteldeft-find-file-id-insert :wk "insert id")
-    "dI" '(zetteldeft-find-file-full-title-insert :wk "insert full title")
-    "do" '(zetteldeft-find-file :wk "find file")
-    "dn" '(zetteldeft-new-file :wk "new file")
-    "dN" '(zetteldeft-new-file-and-link :wk "new file & link")
-    "dr" '(zetteldeft-file-rename :wk "rename")
-    "dx" '(zetteldeft-count-words :wk "count words"))
+  ;; (general-define-key
+  ;;   :prefix ","
+  ;;   :non-normal-prefix "C-SPC"
+  ;;   :states '(normal visual motion emacs)
+  ;;   :keymaps 'override
+  ;;   "d"  '(nil :wk "deft")
+  ;;   "dd" '(deft :wk "deft")
+  ;;   "dD" '(zetteldeft-deft-new-search :wk "new search")
+  ;;   "dR" '(deft-refresh :wk "refresh")
+  ;;   "ds" '(zetteldeft-search-at-point :wk "search at point")
+  ;;   "dc" '(zetteldeft-search-current-id :wk "search current id")
+  ;;   "df" '(zetteldeft-follow-link :wk "follow link")
+  ;;   "dF" '(zetteldeft-avy-file-search-ace-window :wk "avy file other window")
+  ;;   "dl" '(zetteldeft-avy-link-search :wk "avy link search")
+  ;;   "dt" '(zetteldeft-avy-tag-search :wk "avy tag search")
+  ;;   "dT" '(zetteldeft-tag-buffer :wk "tag list")
+  ;;   "di" '(zetteldeft-find-file-id-insert :wk "insert id")
+  ;;   "dI" '(zetteldeft-find-file-full-title-insert :wk "insert full title")
+  ;;   "do" '(zetteldeft-find-file :wk "find file")
+  ;;   "dn" '(zetteldeft-new-file :wk "new file")
+  ;;   "dN" '(zetteldeft-new-file-and-link :wk "new file & link")
+  ;;   "dr" '(zetteldeft-file-rename :wk "rename")
+  ;;   "dx" '(zetteldeft-count-words :wk "count words"))
 
 #+END_SRC
 
 ** org-download
 
 #+BEGIN_SRC emacs-lisp
-  (use-package org-download 
-    :ensure t
-    :init
-    (setq org-download-screenshot-method "screencapture -i %s")
-    (setq org-download-method 'directory) 
-    (setq-default org-download-image-dir "/Users/admin/Dropbox/org/img")
-    (setq org-image-actual-width nil)
-    ;; (setq org-download-attr-list '("#+attr_org: :width 256px" "#+caption:" "#+NAME: fig:" ))
-  )
+  ;; (use-package org-download 
+  ;;   :ensure t
+  ;;   :init
+  ;;   (setq org-download-screenshot-method "screencapture -i %s")
+  ;;   (setq org-download-method 'directory) 
+  ;;   (setq-default org-download-image-dir "/Users/admin/Dropbox/org/img")
+  ;;   (setq org-image-actual-width nil)
+  ;;   ;; (setq org-download-attr-list '("#+attr_org: :width 256px" "#+caption:" "#+NAME: fig:" ))
+  ;; )
 
 
 
 #+END_SRC
+
+** web-mode
+#+BEGIN_SRC emacs-lisp
+  ;; (require 'web-mode)
+  ;; (add-to-list 'auto-mode-alist '("\\.vue?\\'" . web-mode))
+
+#+END_SRC
+
+** Vue
+#+BEGIN_SRC emacs-lisp
+    (use-package vue-mode
+      :ensure t)
+    (add-hook 'mmm-mode-hook
+              (lambda ()
+                (set-face-background 'mmm-default-submode-face nil)))
+  (electric-pair-mode 1)
+#+END_SRC
+  
+** fold
+#+BEGIN_SRC emacs-lisp
+  (require 'vimish-fold)
+  (use-package vimish-fold
+    :ensure
+    :after evil)
+
+  (use-package evil-vimish-fold
+    :ensure
+    :after vimish-fold
+    :init
+    (setq evil-vimish-fold-mode-lighter " ⮒")
+    (setq evil-vimish-fold-target-modes '(prog-mode conf-mode text-mode))
+    :config
+    (global-evil-vimish-fold-mode))
+
+  (general-define-key
+   :states 'normal
+   "zf" 'vimish-fold-avy)
+#+END_SRC
+
 

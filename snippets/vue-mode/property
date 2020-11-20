@@ -1,6 +1,0 @@
-# key: t
-# name: property
-# --
-${1:property} () {
-	$0
-},

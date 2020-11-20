@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: data
+# key: datar
+# condition: (looking-back "^\t+datar" nil)
+# expand-env: ((yas-indent-line 'fixed))
+# --
+${1:arrayname}: [
+	{ id: 0, ${2:title}: '$0' },
+],

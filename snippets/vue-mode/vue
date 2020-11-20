@@ -1,0 +1,24 @@
+# -*- mode: snippet -*-
+# name: vue
+# key: vue
+# condition: (looking-back "^full" nil)
+# --
+
+<template lang="pug">
+h2 ${1:Hello!}
+</template>
+
+<script>
+
+export default {
+	data: () => ({
+		
+	}),
+}
+
+</script>
+
+<style scoped lang="scss">
+@import '@/assets/css/colors.scss';
+
+</style>

@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: test
+# key: test
+# condition: (looking-back "^\t+test" nil)
+# expand-env: ((yas-indent-line 'fixed))
+# --
+test () {
+	console.log('${foooo}')
+},$0

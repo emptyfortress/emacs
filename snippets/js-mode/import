@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: import
+# key: i
+# condition: (looking-back "^i" nil)
+# --
+import ${1:component} from '@/components/$1'
+$0

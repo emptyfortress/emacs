@@ -1,0 +1,16 @@
+# -*- mode: snippet -*-
+# name: watch
+# key: watch
+# condition: (looking-back "^\t+watch" nil)
+# expand-env: ((yas-indent-line 'fixed))
+# --
+watch: {
+	${1:parameter}: function() {
+		if (this.$1) {
+			let that = this
+			setTimeout(function() {
+				$0
+			},100)
+		}
+	}
+}

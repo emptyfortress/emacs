@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: border-radius
+# key: br
+# condition: (looking-back "^\t+br" nil)
+# expand-env: ((yas-indent-line 'fixed))
+# --
+border-radius: ${0:4px};

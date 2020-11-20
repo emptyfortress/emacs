@@ -9,7 +9,7 @@
 (define-abbrev-table 'global-abbrev-table
   '(
     ;; code
-    ("td" "TODO:")
+    ; ("td" "TODO:")
     ("fxm" "FIXME:")
     ("readme" "New readme text added.")
     ("fx" "Some small fixes added. Not so important.")

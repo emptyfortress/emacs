@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: sec
+# key: sec
+# condition: (looking-back "^\t+sec" nil)
+# expand-env: ((yas-indent-line 'fixed))
+# --
+${section}: {
+	$0
+},
