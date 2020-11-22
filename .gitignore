@@ -10,3 +10,6 @@
 /.org-id-locations
 /emojis/
 /org-clock-save.el
+/.cache/
+/.lsp-session-v1
+/request/
