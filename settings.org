@@ -1416,6 +1416,7 @@ https://github.com/alphapapa/unpackaged.el#smerge-mode
               (lambda ()
                 (set-face-background 'mmm-default-submode-face nil)))
   (electric-pair-mode 1)
+  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
 #+END_SRC
   
 ** fold
