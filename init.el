@@ -20,7 +20,7 @@
  '(org-roam-directory "~/Dropbox/org")
  '(package-selected-packages
    (quote
-    (typescript-mode js2-mode evil-vimish-fold vimish-fold lorem-ipsum pug-mode web-mode anki-editor org-download ace-window expand-region company ranger git-gutter evil-magit magit avy gruvbox-theme org))))
+    (csv-mode typescript-mode js2-mode evil-vimish-fold vimish-fold lorem-ipsum pug-mode web-mode anki-editor org-download ace-window expand-region company ranger git-gutter evil-magit magit avy gruvbox-theme org))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

@@ -725,6 +725,7 @@
   ;; Hooks to Enable Tabs
   (add-hook 'prog-mode-hook 'enable-tabs)
   (add-hook 'vue-mode-hook 'enable-tabs)
+  (add-hook 'csv-mode-hook 'enable-tabs)
   ;; Hooks to Disable Tabs
   (add-hook 'lisp-mode-hook 'disable-tabs)
   (add-hook 'emacs-lisp-mode-hook 'disable-tabs)
@@ -733,6 +734,7 @@
   (setq-default python-indent-offset custom-tab-width) ;; Python
   (setq-default js-indent-level custom-tab-width)      ;; Javascript
   (setq-default typescript-indent-level custom-tab-width)      ;; Javascript
+  (setq-default csv-indent-level custom-tab-width)      ;; Javascript
 
   ;; Making electric-indent behave sanely
   (setq-default electric-indent-inhibit t)
