@@ -985,6 +985,11 @@ package show feedback on evil edit code
 
 ** prettier
 #+BEGIN_SRC emacs-lisp
+  (use-package prettier-js
+    :ensure t
+    :after (typescript-mode)
+    :hook (typescript-mode . maybe-use-prettier))
+
   ;;       (require 'prettier-js)
 
   ;;        (add-hook 'js2-mode-hook 'prettier-js-mode)
@@ -1001,13 +1006,13 @@ package show feedback on evil edit code
   ;;          (add-hook 'vue-mode-hook #'add-node-modules-path)
   ;;          (add-hook 'vue-mode-hook #'prettier-js-mode)))
 
-  ;; (defun maybe-use-prettier ()
-  ;;   "Enable prettier-js-mode if an rc file is located."
-  ;;   (if (locate-dominating-file default-directory ".prettierrc")
-  ;;       (prettier-js-mode +1)))
+  (defun maybe-use-prettier ()
+    "Enable prettier-js-mode if an rc file is located."
+    (if (locate-dominating-file default-directory ".prettierrc")
+        (prettier-js-mode +1)))
 
-  ;;   (add-hook 'vue-mode-hook 'maybe-use-prettier)
-  ;;   (add-hook 'js2-mode-hook 'maybe-use-prettier)
+    (add-hook 'vue-mode-hook 'maybe-use-prettier)
+    (add-hook 'js2-mode-hook 'maybe-use-prettier)
 #+END_SRC
 
 ** rotate text
