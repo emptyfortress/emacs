@@ -943,30 +943,43 @@ package show feedback on evil edit code
 
 ** flycheck
 #+BEGIN_SRC emacs-lisp
-        (use-package flycheck
-          :ensure t
-          :init (global-flycheck-mode))
+(defun my/use-eslint-from-node-modules ()
+  (let* ((root (locate-dominating-file
+                (or (buffer-file-name) default-directory)
+                "node_modules"))
+         (eslint
+          (and root
+               (expand-file-name "node_modules/.bin/eslint"
+                                 root))))
+    (when (and eslint (file-executable-p eslint))
+      (setq-local flycheck-javascript-eslint-executable eslint))))
 
-        ;; turn on flychecking globally
-        (add-hook 'after-init-hook #'global-flycheck-mode)
+(add-hook 'flycheck-mode-hook #'my/use-eslint-from-node-modules)
+
+      (use-package flycheck
+        :ensure t
+        :init (global-flycheck-mode))
+
+      ;; turn on flychecking globally
+      (add-hook 'after-init-hook #'global-flycheck-mode)
         (setq flycheck-check-syntax-automatically '(mode-enabled save))
 
-              (general-define-key
-               :states 'normal
-               :prefix ","
-               "f n" 'flycheck-next-error)
+      (general-define-key
+        :states 'normal
+        :prefix ","
+        "f n" 'flycheck-next-error)
 
-      ;; fix file and revert
+        ;; fix file and revert
 
-(defun eslint-fix-file ()
-  (interactive)
-  (message "eslint --fixing the file" (buffer-file-name))
-  (shell-command (concat "eslint --fix " (buffer-file-name))))
+  (defun eslint-fix-file ()
+    (interactive)
+    (message "eslint --fixing the file" (buffer-file-name))
+    (shell-command (concat "eslint --fix " (buffer-file-name))))
 
-(defun eslint-fix-file-and-revert ()
-  (interactive)
-  (eslint-fix-file)
-  (revert-buffer t t))
+  (defun eslint-fix-file-and-revert ()
+    (interactive)
+    (eslint-fix-file)
+    (revert-buffer t t))
 
 #+END_SRC
 
@@ -985,34 +998,34 @@ package show feedback on evil edit code
 
 ** prettier
 #+BEGIN_SRC emacs-lisp
-  (use-package prettier-js
-    :ensure t
-    :after (typescript-mode)
-    :hook (typescript-mode . maybe-use-prettier))
+  ;; (use-package prettier-js
+  ;;   :ensure t
+  ;;   :after (typescript-mode)
+  ;;   :hook (typescript-mode . maybe-use-prettier))
 
-  ;;       (require 'prettier-js)
+  ;; ;;       (require 'prettier-js)
 
-  ;;        (add-hook 'js2-mode-hook 'prettier-js-mode)
-  ;;        (add-hook 'web-mode-hook 'prettier-js-mode)
-  ;;        (add-hook 'vue-mode-hook 'prettier-js-mode)
+  ;; ;;        (add-hook 'js2-mode-hook 'prettier-js-mode)
+  ;; ;;        (add-hook 'web-mode-hook 'prettier-js-mode)
+  ;; ;;        (add-hook 'vue-mode-hook 'prettier-js-mode)
 
-  ;;   (eval-after-load 'web-mode
-  ;;       '(progn
-  ;;          (add-hook 'web-mode-hook #'add-node-modules-path)
-  ;;          (add-hook 'web-mode-hook #'prettier-js-mode)))
+  ;; ;;   (eval-after-load 'web-mode
+  ;; ;;       '(progn
+  ;; ;;          (add-hook 'web-mode-hook #'add-node-modules-path)
+  ;; ;;          (add-hook 'web-mode-hook #'prettier-js-mode)))
 
-  ;;   (eval-after-load 'vue-mode
-  ;;       '(progn
-  ;;          (add-hook 'vue-mode-hook #'add-node-modules-path)
-  ;;          (add-hook 'vue-mode-hook #'prettier-js-mode)))
+  ;; ;;   (eval-after-load 'vue-mode
+  ;; ;;       '(progn
+  ;; ;;          (add-hook 'vue-mode-hook #'add-node-modules-path)
+  ;; ;;          (add-hook 'vue-mode-hook #'prettier-js-mode)))
 
-  (defun maybe-use-prettier ()
-    "Enable prettier-js-mode if an rc file is located."
-    (if (locate-dominating-file default-directory ".prettierrc")
-        (prettier-js-mode +1)))
+  ;; (defun maybe-use-prettier ()
+  ;;   "Enable prettier-js-mode if an rc file is located."
+  ;;   (if (locate-dominating-file default-directory ".prettierrc")
+  ;;       (prettier-js-mode +1)))
 
-    (add-hook 'vue-mode-hook 'maybe-use-prettier)
-    (add-hook 'js2-mode-hook 'maybe-use-prettier)
+  ;;   (add-hook 'vue-mode-hook 'maybe-use-prettier)
+  ;;   (add-hook 'js2-mode-hook 'maybe-use-prettier)
 #+END_SRC
 
 ** rotate text
