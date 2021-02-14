@@ -9,10 +9,10 @@
 (define-abbrev-table 'global-abbrev-table
   '(
     ;; code
-    ; ("td" "TODO:")
+    ("td" "TODO:")
     ("fxm" "FIXME:")
     ("readme" "New readme text added.")
-    ("fx" "Some small fixes added. Not so important.")
+    ("fx" "Small fixes. Not so important.")
     ("clean" "Clean code from blanks line and comments.")
 
     ;; net abbrev
@@ -56,7 +56,7 @@
     ("os3" "operating system")
 
     ;; programing
-    ("=>" "=>")
+    ;; ("=>" "=>")
 
     ;; regex
     ("xaz" "\\([A-Za-z0-9]+\\)")

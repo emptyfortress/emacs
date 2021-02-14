@@ -1,13 +1,12 @@
 # -*- mode: snippet -*-
-# name: anki
-# key: emm
+# name: ab
+# key: abb
 # --
-
 ${1:enumerate}
   :PROPERTIES:
-  :ANKI_DECK: Emacs
+  :ANKI_DECK: abbrev
   :ANKI_NOTE_TYPE: Basic
-  :ANKI_TAGS: emacs shorcuts
+  :ANKI_TAGS: abbrev shorcuts
   :END:
 *** Front
 $1
